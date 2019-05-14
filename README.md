@@ -4,11 +4,10 @@ The ENS system consists of a set of smart contracts that govern the storage of E
 
 
 ## Smart contract logic
-
-
+In addition to the info below code examples can be found in the migration and test scripts. 
 
 #### Terminology
-A 'node' is the [namehash](https://docs.ens.domains/#namehash) of the full domain, which is the result of recursive hashing of subdomains until the TLD is reached. For example 'namehash("test.eth") = keccak256'
+A 'node' is the [namehash](https://docs.ens.domains/#namehash) of the full domain, which is the result of recursive hashing of subdomains until the TLD is reached. For example `namehash("test.eth") = keccak256(namehash("eth"), keccak256("test"))`.
 
 A 'label' is the `keccac256(toHex(<name>))` and identifies what is to be registered. E.g. the label for 'test' can be registered on the 'eth' registrar to receive 'test.eth', the namehash of which can then be looked up in the registry.
 
@@ -53,6 +52,7 @@ interface ENS {
     function ttl(bytes32 node) external view returns (uint64);
 }
 ```
+
 #### Registrar
 The registry contains only basic access control (the deployer may assign domains after which the owners control subdomains). For users to be able to claim domains on their own a registrar can be deployed. A registrar can be set up to hand out subdomains for a fixed domain. Typically the main registrar is set up to own 'eth' and can assign control over e.g. 'test.eth' domains. Once someone owns 'test.eth' they are free to deploy another registrar and make that registrar owner of the domain, allowing for custom domain distribution within a subdomain.
 
@@ -98,10 +98,6 @@ contract FIFSRegistrar {
 }
 ```
 
-#### Resolver
-Examples can be found [here](https://github.com/ensdomains/resolvers) on github.
-
-
 
 ## Setup
 #### Short version
@@ -136,3 +132,4 @@ The owner of a node (e.g. 'test.eth') can change the resolver by calling setReso
 
 # TODOs
 - Tests for the registry and registrar
+- Include resolver can be found [here](https://github.com/ensdomains/resolvers) on github.
