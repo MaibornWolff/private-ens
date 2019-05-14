@@ -1,0 +1,23 @@
+{
+  "name": "private-ens",
+  "version": "1.0.0",
+  "description": "Setup ENS (Registry, Registrar, Resolver) on a private network",
+  "main": "index.js",
+  "scripts": {
+    "copyEnsInterface": "cp ./node_modules/@ensdomains/ens/contracts/ENS.sol ./contracts/",
+    "copyEnsRegistry": "cp ./node_modules/@ensdomains/ens/contracts/ENSRegistry.sol ./contracts/",
+    "copyFifsRegistrar": "cp ./node_modules/@ensdomains/ens/contracts/FIFSRegistrar.sol ./contracts/",
+    "copyEnsContracts": "npm run copyEnsInterface && npm run copyEnsRegistry && npm run copyFifsRegistrar",
+    "deployContracts": "./node_modules/.bin/truffle migrate --reset",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.maibornwolff.de:EduardH/private-ens.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ensdomains/ens": "^0.3.5"
+  }
+}
