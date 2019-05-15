@@ -21,8 +21,6 @@ contract('FIFSRegistrar', function (accounts) {
   const subdomainLabel = web3.utils.keccak256(subdomain);
   const subdomainNamehash = namehash.hash(`${subdomain}.${tld}`);
 
-  const ttl = 5;
-
   before(async function() {
       registryInstance = await ENSRegistry.new();
       registrarInstance = await FIFSRegistrar.new(registryInstance.address, tldNamehash);
