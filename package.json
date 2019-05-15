@@ -8,6 +8,10 @@
     "copyEnsRegistry": "cp ./node_modules/@ensdomains/ens/contracts/ENSRegistry.sol ./contracts/",
     "copyFifsRegistrar": "cp ./node_modules/@ensdomains/ens/contracts/FIFSRegistrar.sol ./contracts/",
     "copyEnsContracts": "npm run copyEnsInterface && npm run copyEnsRegistry && npm run copyFifsRegistrar",
+    "copyResolver": "cp ./node_modules/@ensdomains/resolver/contracts/PublicResolver.sol ./contracts/",
+    "copyResolverBase": "cp ./node_modules/@ensdomains/resolver/contracts/ResolverBase.sol ./contracts/",
+    "copyResolverProfiles": "cp -a ./node_modules/@ensdomains/resolver/contracts/profiles ./contracts",
+    "copyResolverContracts": "npm run copyResolver && npm run copyResolverBase",
     "deployContracts": "./node_modules/.bin/truffle migrate --reset",
     "test": "./node_modules/.bin/truffle test"
   },
@@ -19,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@ensdomains/ens": "^0.3.5",
+    "@ensdomains/resolver": "^0.1.6",
     "eth-ens-namehash": "^2.0.8"
   }
 }

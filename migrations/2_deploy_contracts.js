@@ -3,6 +3,7 @@
 
 const ENS = artifacts.require("ENSRegistry.sol");
 const FIFSRegistrar = artifacts.require('FIFSRegistrar.sol');
+const PublicResolver = artifacts.require('PublicResolver.sol');
 
 const web3 = new (require('web3'))();
 const namehash = require('eth-ens-namehash');
@@ -30,7 +31,6 @@ async function deployFIFSRegistrar(deployer, tld) {
   var rootNode = getRootNodeFromTLD(tld);
 
   let ensInstance, registrarInstance;
-
   deployer.deploy(ENS)
   .then(function(instance) {
     ensInstance = instance;
@@ -39,7 +39,8 @@ async function deployFIFSRegistrar(deployer, tld) {
     registrarInstance = instance;
     return ensInstance.setSubnodeOwner('0x0', rootNode.sha3, registrarInstance.address);
   }).then(function(receipt) {
-    console.log(`Status: ${receipt.receipt.status}`)
+    console.log(`ENS Registry and registrar status: ${receipt.receipt.status}`)
+    return deployer.deploy(PublicResolver, ensInstance.address);
   })
 }
 

@@ -1,5 +1,5 @@
 # Deploy and use ENS on a private chain
-The ENS system consists of a set of smart contracts that govern the storage of ENS domain to address, how domains are distributed, ownership changed, and resolved. The functionality for the ENS registry and registrar is from [@ensdomains/ens](https://github.com/ensdomains/ens).
+The ENS system consists of a set of smart contracts that govern the storage of ENS domain to address, how domains are distributed, ownership changed, and resolved. The functionality for the ENS registry and registrar is from [@ensdomains/ens](https://github.com/ensdomains/ens) and the resolver from [@ensdomains/resolver](https://github.com/ensdomains/resolvers).
 
 
 
