@@ -19,7 +19,6 @@ contract('ENSRegistry', function (accounts) {
   const subdomainLabel = web3.utils.keccak256(subdomain);
   const subdomainNamehash = namehash.hash(`${subdomain}.${tld}`);
 
-  const label = '0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0';
   const ttl = 5;
 
   before(async function() {
@@ -53,7 +52,7 @@ contract('ENSRegistry', function (accounts) {
   it('should not allow to act without being owner', async function () {
     await exceptions.catchRevert(registryInstance.setOwner(initialNode, deployer));
     await exceptions.catchRevert(registryInstance.setResolver(initialNode, deployer));
-    await exceptions.catchRevert(registryInstance.setSubnodeOwner(initialNode, label, deployer));
+    await exceptions.catchRevert(registryInstance.setSubnodeOwner(initialNode, tldLabel, deployer));
     await exceptions.catchRevert(registryInstance.setTTL(initialNode, ttl));
   });
 

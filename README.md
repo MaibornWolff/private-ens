@@ -4,12 +4,12 @@ The ENS system consists of a set of smart contracts that govern the storage of E
 
 
 ## Smart contract logic
-In addition to the info below code examples can be found in the migration and test scripts. 
+In addition to the info below code examples can be found in the migration and test scripts.
 
 #### Terminology
 A 'node' is the [namehash](https://docs.ens.domains/#namehash) of the full domain, which is the result of recursive hashing of subdomains until the TLD is reached. For example `namehash("test.eth") = keccak256(namehash("eth"), keccak256("test"))`.
 
-A 'label' is the `keccac256(toHex(<name>))` and identifies what is to be registered. E.g. the label for 'test' can be registered on the 'eth' registrar to receive 'test.eth', the namehash of which can then be looked up in the registry.
+A 'label' is the `keccac256(<name>)` and identifies what is to be registered. E.g. the label for 'test' can be registered on the 'eth' registrar to receive 'test.eth', the namehash of which can then be looked up in the registry.
 
 
 
