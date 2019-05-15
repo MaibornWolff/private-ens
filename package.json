@@ -11,7 +11,8 @@
     "copyResolver": "cp ./node_modules/@ensdomains/resolver/contracts/PublicResolver.sol ./contracts/",
     "copyResolverBase": "cp ./node_modules/@ensdomains/resolver/contracts/ResolverBase.sol ./contracts/",
     "copyResolverProfiles": "cp -a ./node_modules/@ensdomains/resolver/contracts/profiles ./contracts",
-    "copyResolverContracts": "npm run copyResolver && npm run copyResolverBase",
+    "copyResolverContracts": "npm run copyResolver && npm run copyResolverBase && npm run copyResolverProfiles",
+    "copyContracts": "npm run copyResolverContracts && npm run copyEnsContracts",
     "deployContracts": "./node_modules/.bin/truffle migrate --reset",
     "test": "./node_modules/.bin/truffle test"
   },
