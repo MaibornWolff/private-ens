@@ -10,7 +10,7 @@ contract('FIFSRegistrar', function (accounts) {
   const bob = accounts[1];
 
   let registryInstance;
-  let registrarInsance;
+  let registrarInstance;
   const initialNode = '0x00';
 
   const tld = 'eth';
