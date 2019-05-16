@@ -1,6 +1,3 @@
-// const test = require("../node_modules/@ensdomains/ens/contracts/ENSRegistry.sol")
-// console.log(test);
-
 const ENS = artifacts.require("ENSRegistry.sol");
 const FIFSRegistrar = artifacts.require('FIFSRegistrar.sol');
 const PublicResolver = artifacts.require('PublicResolver.sol');
@@ -22,12 +19,12 @@ function getRootNodeFromTLD(tld) {
 }
 
 /**
- * Deploy the ENS and FIFSRegistrar
+ * Deploy the ENS, FIFSRegistrar, and public resolver
  *
  * @param {Object} deployer truffle deployer helper
  * @param {string} tld tld which the FIFS registrar takes charge of
  */
-async function deployFIFSRegistrar(deployer, tld) {
+async function deployFIFSRegistrarAndPublicResolver(deployer, tld) {
   var rootNode = getRootNodeFromTLD(tld);
 
   let ensInstance, registrarInstance;
@@ -46,5 +43,5 @@ async function deployFIFSRegistrar(deployer, tld) {
 
 module.exports = function(deployer, network) {
   var tld = 'eth';
-  deployFIFSRegistrar(deployer, tld);
+  deployFIFSRegistrarAndPublicResolver(deployer, tld);
 };
