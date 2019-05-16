@@ -1,9 +1,9 @@
 # Deploy and use ENS on a private chain
-The ENS system consists of a set of smart contracts that govern the storage of ENS domain to address, how domains are distributed, ownership changed, and resolved. The functionality for the ENS registry and registrar is from [@ensdomains/ens](https://github.com/ensdomains/ens) and the resolver from [@ensdomains/resolver](https://github.com/ensdomains/resolvers).
+The ENS system consists of a set of smart contracts that govern the mapping of ENS domain to address, how the domains are distributed, access control over the data stored under a domain, as well as the lookup of information based on a domain. This repo provides a unified way of deploying a complete ENS setup (registry, registrar, and resolver) with usage examples. The contracts for the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens)) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers)) are fetched from npm and can be deployed and linked together with a single 'truffle migrate'.
 
 
 
-## Smart contract logic
+## Short introduction to the inner workings of ENS
 In addition to the info below code examples can be found in the migration and test scripts.
 
 #### Terminology
@@ -14,7 +14,7 @@ A 'label' is the `keccac256(<name>)` and identifies what is to be registered. E.
 
 
 #### ENS Registry
-This smart contract where the mapping of domain name to ownership record is stored. The key of this domain (e.g. 'test.eth' is the namehash. The value of this mapping stores the owner of this domain, the resolver, and a time limit.
+This smart contract where the mapping of domain name to ownership record is stored. The key of this domain (e.g. 'test.eth') is the namehash. The value of this mapping stores the owner of this domain, the resolver, and a time limit.
 ```C
 struct Record {
     address owner;
@@ -54,9 +54,9 @@ interface ENS {
 ```
 
 #### Registrar
-The registry contains only basic access control (the deployer may assign domains after which the owners control subdomains). For users to be able to claim domains on their own a registrar can be deployed. A registrar can be set up to hand out subdomains for a fixed domain. Typically the main registrar is set up to own 'eth' and can assign control over e.g. 'test.eth' domains. Once someone owns 'test.eth' they are free to deploy another registrar and make that registrar owner of the domain, allowing for custom domain distribution within a subdomain.
+The registry contains only basic access control (the deployer may assign domains after which the owners control subdomains). For users to be able to claim domains on their own a registrar can be deployed. A registrar can be set up to hand out subdomains for a fixed domain. Typically the main registrar is set up to own the 'eth' node and can assign control over e.g. 'test.eth' domains. Once someone owns a (sub-)domain they are free to deploy another registrar and make that registrar owner of theis domain, allowing for custom domain distribution within a subdomain.
 
-Registrars can assign ownership to subdomains in any way they choose. Until May 4th 2019 the mainnet used an auction-based HashRegistrar. A basic registrar is the 'first in first served' registrar which gives out unused domains to whoever claims them first.
+Registrars can assign ownership to subdomains in any way they choose. Until May 4th 2019 the mainnet used an auction-based HashRegistrar. One of the simplest registrars is the 'first in first served' registrar which gives out unused domains to whoever claims them first.
 
 
 ```c
@@ -98,24 +98,66 @@ contract FIFSRegistrar {
 }
 ```
 
+#### Resolver
+While the registry only contains ownership information about domains and a pointer to the resolver, the resolver is the place where detailed information about a domain can be stored. A common use-case is to have the resolver store the address of a contract that should be reachable under a domain as well as additional information such as the contract ABI. Resolvers can implement different schemes of who can modify the stored information. Usually there is either a single owner of the resolver that may modify it, or more user-friendly: the resolver relies on the node ownership information of the registrar. In addition, resolvers can extend specialized resolvers that store a mapping with specific information such as the address with getters and setters:
+
+```c
+pragma solidity ^0.5.0;
+
+import "../ResolverBase.sol";
+
+contract AddrResolver is ResolverBase {
+    bytes4 constant private ADDR_INTERFACE_ID = 0x3b3b57de;
+
+    event AddrChanged(bytes32 indexed node, address a);
+
+    mapping(bytes32=>address) addresses;
+
+    /**
+     * Sets the address associated with an ENS node.
+     * May only be called by the owner of that node in the ENS registry.
+     * @param node The node to update.
+     * @param addr The address to set.
+     */
+    function setAddr(bytes32 node, address addr) external authorised(node) {
+        addresses[node] = addr;
+        emit AddrChanged(node, addr);
+    }
+
+    /**
+     * Returns the address associated with an ENS node.
+     * @param node The ENS node to query.
+     * @return The associated address.
+     */
+    function addr(bytes32 node) public view returns (address) {
+        return addresses[node];
+    }
+
+    function supportsInterface(bytes4 interfaceID) public pure returns(bool) {
+        return interfaceID == ADDR_INTERFACE_ID || super.supportsInterface(interfaceID);
+    }
+}
+```
+
 
 ## Setup
 #### Short version
 1. 'npm install'
-2. 'npm run copyEnsContracts' to copy the relevant contracts to the 'contracts' folder
-3. 'truffle migrate --reset' to deploy the registry and registrar.
+2. 'npm run copyContracts' to copy the relevant contracts from the contract repos in 'node_modules' to the 'contracts' folder
+3. 'npm run deployContracts' to deploy the registry, registrar, and resolver
 
 
 #### Under the hood
 The migration script does the following:
-1. Deploy ENSRegistry. By default the deployer will own the node '0x0'
-2. Deploy the top level (i.e. for tld) registrar. All domains registered here will automatically receive the suffix .eth in the registry. Deploy with parameters:
+1. Deploy ENSRegistry. By default the deployer will own the root node '0x0'
+2. Deploy TLD 'eth' registrar. All label registered here will automatically receive the suffix .eth in the registry resulting in the domain label.eth. The registrar is deployed with parameters:
   - ensAddr: Address of the ENSRegistry dpeloyed in step 1
-  - node: Namehash of the tld name, e.g. for eth '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae'
+  - node: Namehash, for 'eth' this is '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae'
 3. Set Registrar to be subnode owner of 'eth' by calling setSubnodeOwner in the registry with parameters:
-  - node: 0x00 (this is the only one the deployer is allowed to modify)
-  - label: Label (keccak of the name) of the node that the registrar should be the owner of, for 'eth' the hex value is '0x657468' and keccak('0x657468') is 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0.
+  - node: 0x00 (initial root node)
+  - label: Label of the node that the registrar should be the owner of, for 'eth' the this is keccak256('eth') = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0.
   - owner: Address of the registrar deployed in step 2
+4.
 
 
 ## Use
