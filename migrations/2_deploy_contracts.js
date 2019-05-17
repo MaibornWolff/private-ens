@@ -36,7 +36,6 @@ async function deployFIFSRegistrarAndPublicResolver(deployer, tld) {
     registrarInstance = instance;
     return ensInstance.setSubnodeOwner('0x0', rootNode.sha3, registrarInstance.address);
   }).then(function(receipt) {
-    console.log(`ENS Registry and registrar status: ${receipt.receipt.status}`)
     return deployer.deploy(PublicResolver, ensInstance.address);
   })
 }
