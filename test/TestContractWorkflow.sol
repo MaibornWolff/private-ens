@@ -65,6 +65,13 @@ contract TestContractWorkflow {
     function registerAndStoreAddress() private {
         registrar.register(labelOf("test"), address(this));
         ens.setResolver(node, address(resolver));
+
+        require(resolver.supportsInterface(0x2203ab56));
+        require(resolver.supportsInterface(0x3b3b57de));
+        require(resolver.supportsInterface(0xbc1c58d1));
+        require(resolver.supportsInterface(0x01ffc9a7));
+        require(resolver.supportsInterface(0x691f3431));
+
         resolver.setAddr(node, address(this));
     }
 
