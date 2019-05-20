@@ -3,7 +3,7 @@ pragma solidity ^0.5;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
-import "../contracts/ENSInfrastructureInterface.sol";
+import "../contracts/AbstractENSInfrastructure.sol";
 
 
 contract TestContractWorkflow {
