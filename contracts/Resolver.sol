@@ -1,5 +1,4 @@
-import "./ENS.sol";
-
+pragma solidity ^0.5.0;
 
 contract Resolver {
     function setABI(bytes32 node, uint256 contentType, bytes calldata data) external;
@@ -25,9 +24,4 @@ contract Resolver {
 
     function setAuthorisation(bytes32 node, address target, bool isAuthorised) external;
     function supportsInterface(bytes4 interfaceID) public pure returns(bool);
-}
-
-
-contract FIFSRegistrar {
-    function register(bytes32 label, address owner) public;
 }

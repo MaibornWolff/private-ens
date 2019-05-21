@@ -3,13 +3,12 @@ pragma solidity ^0.5;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 
-import "../contracts/AbstractENSInfrastructure.sol";
+import "../contracts/Registrar.sol";
+import "../contracts/ENSReader.sol";
 
 
-contract TestContractWorkflow {
-    ENS private ens;
-    FIFSRegistrar private registrar;
-    Resolver private resolver;
+contract TestContractWorkflow is ENSReader(DeployedAddresses.ENSRegistry()) {
+
 
     bytes32 private node = // namehash('test.eth')
         0xeb4f647bea6caa36333c816d7b46fdcb05f9466ecacc140ea8c66faf15b3d9f1;
@@ -17,17 +16,21 @@ contract TestContractWorkflow {
     bytes32 private tldNamehash = // namehash('eth')
         0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
 
+    string private someData = "This data is stored in the resolver";
+    string private key = "key";
+
     constructor() public {
-        ens = ENS(DeployedAddresses.ENSRegistry());
-        registrar = FIFSRegistrar(DeployedAddresses.FIFSRegistrar());
-        resolver = Resolver(DeployedAddresses.PublicResolver());
-        registerAndStoreAddress();
+        Registrar registrar = Registrar(DeployedAddresses.FIFSRegistrar());
+        registrar.register(keccak256(abi.encodePacked("test")), address(this));
+        ens.setResolver(node, DeployedAddresses.PublicResolver());
+        Resolver(DeployedAddresses.PublicResolver()).setAddr(node, address(this));
+        Resolver(DeployedAddresses.PublicResolver()).setText(node, key, someData);
     }
 
     function testSetup() public {
         Assert.equal(
             ens.owner(tldNamehash),
-            address(registrar),
+            DeployedAddresses.FIFSRegistrar(),
             "Owner of eth is the registrar"
         );
 
@@ -39,43 +42,18 @@ contract TestContractWorkflow {
 
         Assert.equal(
             ens.resolver(node),
-            address(resolver),
+            DeployedAddresses.PublicResolver(),
             "Resolver for the test.eth node is set in registry"
         );
-
-        Assert.equal(
-            resolver.addr(node),
-            address(this),
-            "Resolver should point to this"
-        );
     }
 
-    function testLookup() public {
-        Assert.equal(
-            lookup(node),
-            address(this),
-            "Lookup returns this address"
-        );
+    function testAddressLookup() public {
+        address resolverAddrForNode = addressOf(node);
+        Assert.equal(resolverAddrForNode, address(this), "Address lookup returns stored address");
     }
 
-    function labelOf(string memory _name) private returns (bytes32) {
-        return keccak256(abi.encodePacked(_name));
-    }
-
-    function registerAndStoreAddress() private {
-        registrar.register(labelOf("test"), address(this));
-        ens.setResolver(node, address(resolver));
-
-        require(resolver.supportsInterface(0x2203ab56));
-        require(resolver.supportsInterface(0x3b3b57de));
-        require(resolver.supportsInterface(0xbc1c58d1));
-        require(resolver.supportsInterface(0x01ffc9a7));
-        require(resolver.supportsInterface(0x691f3431));
-
-        resolver.setAddr(node, address(this));
-    }
-
-    function lookup(bytes32 _node) private returns (address) {
-        return Resolver(ens.resolver(_node)).addr(_node);
+    function testTextLookup() public {
+        string memory resolverTextForNode = textOf(node, key);
+        Assert.equal(resolverTextForNode, someData, "Text lookup returns stored data");
     }
 }
