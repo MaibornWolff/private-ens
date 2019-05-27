@@ -1,5 +1,9 @@
 # Deploy and use the Ethereum Name Service on a private chain
-The ENS is a set of smart contracts which enables users to assign additional information, most importantly human-readable names, to Ethereum addresses. ENS has many uses on the main chain (you can check [the official introduction](https://docs.ens.domains/) if you don't know about them!), most of which are also useful on private networks. However instructions of the whole process of ENS setup to use have to be pieced together from various repositories and sources. This truffle project bundles the official ENS contracts ([@ensdomains/ens](https://github.com/ensdomains/ens), [@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) and provides several quality-of-life pieces of code that tie everything together to make getting started and working with ENS on a private network easier.
+The ENS is a set of smart contracts which enables users to assign additional information, most importantly human-readable names, to Ethereum accounts.
+ENS has many uses on the main chain (you can check [the official introduction](https://docs.ens.domains/) if you don't know about them!) and is [one of the most used](https://blockspur.com/ethereum_contracts/transactions) pieces of on-chain infrastructure.
+Naturally you may want to set it up on your private network as well.
+However instructions on how to set up ENS from scratch have to be pieced together from various repositories and sources.
+This truffle project bundles the official ENS contracts ([@ensdomains/ens](https://github.com/ensdomains/ens), [@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) and provides several scripts and pieces of code that tie everything together to make getting started and working with ENS on a private network easier.
 
 We will cover the following:
 1. Basic ENS Architrecture
@@ -36,7 +40,7 @@ struct Record {
 }
 ```
 
-The remainder of the functionality of the registry is getters and setters for those values.
+The remainder of the functionality of the registry is primarily getters and setters for those values.
 
 ``` js
 pragma solidity >=0.4.24;
@@ -69,7 +73,7 @@ interface ENS {
 #### Registrar
 Since the registry contains only basic access control (only the owner of a node can create subnodes, initially the deployer owns the root node) it only allows manual domain allocation.
 Fortunately, contracts can also own nodes.
-This means we can set up a registrar contract as the owner of the "eth" node in the registry which enables it to distribute subnodes such as "test.eth".
+This means we can set up a registrar contract as the owner of a node, e.g. "eth", in the registry which enables it to distribute subdomains such as "test.eth".
 It allows us to have custom, on-chain logic which governs domain allocation.
 Once we own a (sub-)node we are free to repeat this process and set up another registrar.
 If you are part of the 'test' organisation you could register 'test.eth' and let it point to your custom registrar which only allows certified members of your organisation to claim subdomains such as 'bob.test.eth'.
@@ -226,7 +230,7 @@ contract AddrResolver is ResolverBase {
 
 
 ## 2. ENS deployment
-We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm. To deploy them at once, they are first copied to the `contracts` folder of this truffle project where they can be compiled and migrated at once.
+We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm. To deploy them at once, they are first copied to the `contracts` folder of this truffle project where they can be compiled and migrated at once (using the contracts from node_modules directly would be better - if you know how please get in touch).
 
 #### Short version
 1. `npm install`
@@ -278,4 +282,4 @@ The test folder contains examples of the calls to the registry, registrar, and r
 ## 4. Lookup
 Once `'test.eth'` is properly registered and resolvable, we can look up the associated information in a two step process: First we fetch the resolver that handles the data for our node (`registry.resolver(node)`). Then, we can query the resolver for the information about our node we are looking for, e.g. `resolver.addr(node)`.
 
-Unlike storing records, which rarely necessary to do from an on-chain contract, reading them is often helpful both from off-chain applications (e.g. resolving which address 'yourname.eth' points to for ) and on-chain contracts. The test at `test\testWorkflow.js` demonstrates how to get domain records with web3. For on-chain lookup this repo also includes the helper contract `ENSReader.sol` which can be inherited from to handle registry and registrar lookups on-chain (see `test\TestContractWorkflow.sol`).
+Unlike storing records, which rarely necessary to do from an on-chain contract, reading them is often helpful both from off-chain applications and on-chain contracts. The test at `test\testWorkflow.js` demonstrates how to get domain records with web3. For on-chain lookup this repo also includes the helper contract `ENSReader.sol` which can be inherited from to handle registry and registrar lookups on-chain (see `test\TestContractWorkflow.sol`).
