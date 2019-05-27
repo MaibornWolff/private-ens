@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "../contracts/ENS.sol";
+import "@ensdomains/ens/contracts/ENS.sol";
 import "../contracts/Resolver.sol";
 
 
