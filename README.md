@@ -1,33 +1,26 @@
-# Deploy and use the Ethereum Name Service on a private chain
-The ENS is a set of smart contracts which enables users to assign additional information, most importantly human-readable names, to Ethereum accounts.
+# Deploy and Use the Ethereum Name Service on a Private Chain
+ENS is a set of smart contracts which enables users to assign additional information, most importantly human-readable names, to Ethereum accounts.
 ENS has many uses on the main chain (you can check [the official introduction](https://docs.ens.domains/) if you don't know about them!) and is [one of the most used](https://blockspur.com/ethereum_contracts/transactions) pieces of on-chain infrastructure.
-Naturally you may want to set it up on your private network as well.
+Naturally, you may want to set it up on your private network as well.
 However instructions on how to set up ENS from scratch have to be pieced together from various repositories and sources.
 This truffle project bundles the official ENS contracts ([@ensdomains/ens](https://github.com/ensdomains/ens), [@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) and provides several scripts and pieces of code that tie everything together to make getting started and working with ENS on a private network easier.
 
 We will cover the following:
-1. Basic ENS Architrecture
+
+1. Basic ENS architecture
 2. Setting up ENS: Deploying the registry, registrar, and resolver contracts
 3. Writing to ENS: Registering a name and storing data
 4. Reading data from ENS, both on- and off-chain
 
-
-
-
-
-
-
 ## 1. Introduction to the ENS architecture
 Before going into the technical details, let's briefly recap how the ENS contracts work.
 
-#### [Terminology](https://docs.ens.domains/terminology)
+### [Terminology](https://docs.ens.domains/terminology)
 A complete ENS identifier such as "test.eth" is uniquely identifiable by its node. The node is the result of applying the [namehash](https://docs.ens.domains/#namehash), which hashes the domain components recursively (e.g. `namehash("test.eth") = keccak256(namehash("eth"), keccak256("test"))`).
 
-A label is a component of an ENS identifier such as "test" in the previous example. Within contracts this usually refers to the hash of the label, `keccac256("test")`. When you register the label "test" with the "eth" registrar you become the owner of "test.eth". Once a label is registered, the resulting node is how the domain is identified.
+A label is a component of an ENS identifier such as "test" in the previous example. Within contracts this usually refers to the hash of the label, `keccak256("test")`. When you register the label "test" with the "eth" registrar you become the owner of "test.eth". Once a label is registered, the resulting node is how the domain is identified.
 
-
-
-#### ENS Registry
+### ENS Registry
 This is the central smart contract and stores ownership information as well as the address of a resolver (which we will get to a bit later) for each node.
 
 ```js
@@ -70,7 +63,7 @@ interface ENS {
 }
 ```
 
-#### Registrar
+### Registrar
 Since the registry contains only basic access control (only the owner of a node can create subnodes, initially the deployer owns the root node) it only allows manual domain allocation.
 Fortunately, contracts can also own nodes.
 This means we can set up a registrar contract as the owner of a node, e.g. "eth", in the registry which enables it to distribute subdomains such as "test.eth".
@@ -78,9 +71,7 @@ It allows us to have custom, on-chain logic which governs domain allocation.
 Once we own a (sub-)node we are free to repeat this process and set up another registrar.
 If you are part of the 'test' organisation you could register 'test.eth' and let it point to your custom registrar which only allows certified members of your organisation to claim subdomains such as 'bob.test.eth'.
 
-Until May 2019 the mainnet used an auction-based registrar. On a private net however where there is no need to prevent squatting the 'first in first served' registrar which gives out unowned domains to whoever claims them first is sufficient.
-
-
+Until May 2019 the mainnet used an auction-based registrar. On a private net, however, a 'first come, first served' registrar is sufficient, because there is no need to prevent squatting.
 
 ```js
 pragma solidity ^0.5.0;
@@ -121,11 +112,11 @@ contract FIFSRegistrar {
 }
 ```
 
-#### Resolver
+### Resolver
 While the registry only contains ownership information about nodes and a pointer to the resolver, the resolver is where detailed information about a node is actually stored. The core use-case is to have the resolver store a node's account address, but it could also store a contract ABI, custom text, and more.
-Resolvers can also implement authorisation schemes of who can modify the stored information.
+Resolvers can also implement authorization schemes of who can modify the stored information.
 Usually there is either a single owner of the resolver that may modify it, or more simple: the resolver relies on the node ownership information of the registrar.
-The PublicResolver used here provides this authorisaton scheme and brings several specialised resolvers such as the ABIResolver or AddrResolver together. Similar to the registry, the logic they implement is very simple. Usually they just contain a mapping from node to whatever information they store and the corresponding getters and setters.
+The PublicResolver used here provides this authorization scheme and brings several specialized resolvers such as the ABIResolver or AddrResolver together. Similar to the registry, their logic is very simple. Usually they just contain a mapping from node to whatever information they store and the corresponding getters and setters.
 
 ```js
 pragma solidity ^0.5.0;
@@ -222,27 +213,19 @@ contract AddrResolver is ResolverBase {
 }
 ```
 
-
-
-
-
-
-
-
 ## 2. ENS deployment
-We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm. To deploy them at once, they are first copied to the `contracts` folder of this truffle project where they can be compiled and migrated at once (using the contracts from node_modules directly would be better - if you know how please get in touch).
+We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm. To deploy them at once, they are first copied to the `contracts` folder of this truffle project where they can be compiled and migrated at once (using the contracts from node_modules directly would be better—if you know how please get in touch).
 
-#### Short version
+### Short version
 1. `npm install`
 2. `npm run copyContracts` to copy the registry (`ENS.sol` and `ENSRegistry.sol`), the public resolver (`PublicResolver.sol`, `ResolverBase.sol`, and the `profiles` folder), and the registrar (`FIFSRegistrar.sol`) from `node_modules` to the `contracts` folder
 3. `npm run deployContracts` to deploy the registry, registrar, and resolver
 
-
-#### Under the hood
+### Under the hood
 The migration script `migrations\2_deploy_ens.js` does the following:
 1. Deploy `ENSRegistry`. By default the deployer will own the root node `0x00`
-2. Deploy TLD `'eth'` registrar. All label registered here will automatically receive the suffix .eth in the registry resulting in the domain label.eth. The registrar is deployed with parameters:
-  - `ensAddr`: Address of the ENSRegistry dpeloyed in step 1
+2. Deploy TLD `'eth'` registrar. Any label registered here will automatically receive the suffix .eth in the registry resulting in the domain label.eth. The registrar is deployed with parameters:
+  - `ensAddr`: Address of the ENSRegistry deployed in step 1
   - `node`: Namehash, for `'eth'` this is `0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae`
 3. Set Registrar to be subnode owner of `'eth'` by calling `setSubnodeOwner` in the registry with parameters:
   - `node`: `0x00` (initial root node)
@@ -251,35 +234,27 @@ The migration script `migrations\2_deploy_ens.js` does the following:
 4. Deploy the `PublicResolver` which allows owner of domains to set the stored addreess, ABI, etc. The resolver is deployed with the parameter
   - `ens`: address of the registry deployed in step 1. Domain ownership will be looked up there.
 
-
-
-
-
-
-
-
-
 ## 3. Registering domains and associating data with it
 With the basic infrastructure in place, everybody on the network can now register and resolve domains since we used the publicly accessible `FIFSRegistrar` and `PublicResolver`. Say we have a contract `Test` for which we want to register "test.eth" and store the ABI. We follow the general rule of thumb of doing computation off-chain if possible and register names and populate the resolver as part of the `Test` contract's migration script.
 
-#### Registering a domain with the registrar
+### Registering a domain with the registrar
 First we register `'test.eth'` by calling the registrar's register function with the parameters:
   - `label`: `keccak256('test')` = `0x9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658`
   - `owner`: Address of an account, probably the sender of the registration transaction
 
 To check whether this worked, we can look up the owner of the node (`namehash('test.eth')` = `0xeb4f647bea6caa36333c816d7b46fdcb05f9466ecacc140ea8c66faf15b3d9f1`) in the registry.
 
-#### Setting a resolver in the registry
+### Setting a resolver in the registry
 Now that we own the node `'test.eth'` we can change the resolver by calling the registry's `setResolver(node)` with the address of the resolver contract. Note that this can only be done by the owner we set in the previous step. Calling the registry's resolver function with our node should now return the resolver address.
 
-#### Store an address and other data with the resolver
+### Store an address and other data with the resolver
 Since we own the `'test.eth'` node we now can call `resolver.setAddr(node, contractAddress)` to store the address with the resolver. Similarly, we can store an ABI, name, etc.
 
-#### In code
-The test folder contains examples of the calls to the registry, registrar, and resolver described here (some taken from the repositories mentioned above). To demonstrate how this setup can be performed during the migration of a contract the migrations folder also includes the `ENSHelper.js`. Imported in a migration script it registers a domain, associates the resolver, and stores the contract address and ABI with a single function call (see `migrations\example_3_deploy_contract.js` for a usage example, remove 'example_' to run).
+### In code
+The test folder contains examples of the calls to the registry, registrar, and resolver described here (some taken from the repositories mentioned above). To demonstrate how this setup can be performed during the migration of a contract the migrations folder also includes the `ENSHelper.js`. It should be imported in a migration script. Then, it registers a domain, associates the resolver, and stores the contract address and ABI with a single function call (see `migrations\example_3_deploy_contract.js` for a usage example, remove 'example_' to run).
 
 
 ## 4. Lookup
 Once `'test.eth'` is properly registered and resolvable, we can look up the associated information in a two step process: First we fetch the resolver that handles the data for our node (`registry.resolver(node)`). Then, we can query the resolver for the information about our node we are looking for, e.g. `resolver.addr(node)`.
 
-Unlike storing records, which rarely necessary to do from an on-chain contract, reading them is often helpful both from off-chain applications and on-chain contracts. The test at `test\testWorkflow.js` demonstrates how to get domain records with web3. For on-chain lookup this repo also includes the helper contract `ENSReader.sol` which can be inherited from to handle registry and registrar lookups on-chain (see `test\TestContractWorkflow.sol`).
+Unlike storing records, which is rarely necessary to do from an on-chain contract, reading them is often helpful both from off-chain applications and on-chain contracts. The test at `test\testWorkflow.js` demonstrates how to get domain records with web3. For on-chain lookup this repo also includes the helper contract `ENSReader.sol` which can be inherited from to handle registry and registrar lookups on-chain (see `test\TestContractWorkflow.sol`).
