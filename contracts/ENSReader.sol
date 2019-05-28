@@ -1,9 +1,12 @@
 pragma solidity ^0.5.0;
 
-import "../contracts/ENS.sol";
+import "@ensdomains/ens/contracts/ENS.sol";
 import "../contracts/Resolver.sol";
 
 
+// Wrapper contract for calling PublicResolver getters. First use the node to fetch the resolver
+// address from the registry, then query the resolver function. Registry address needs to be
+// provided on deployment.
 contract ENSReader {
     ENS internal ens;
 

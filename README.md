@@ -214,12 +214,11 @@ contract AddrResolver is ResolverBase {
 ```
 
 ## 2. ENS deployment
-We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm. To deploy them at once, they are first copied to the `contracts` folder of this truffle project where they can be compiled and migrated at once (using the contracts from node_modules directly would be better—if you know how please get in touch).
+We fetch the ENS registry and registrar ([@ensdomains/ens](https://github.com/ensdomains/ens) on github) and the resolver ([@ensdomains/resolver](https://github.com/ensdomains/resolvers) on github) from npm and deploy them at once.
 
 ### Short version
 1. `npm install`
-2. `npm run copyContracts` to copy the registry (`ENS.sol` and `ENSRegistry.sol`), the public resolver (`PublicResolver.sol`, `ResolverBase.sol`, and the `profiles` folder), and the registrar (`FIFSRegistrar.sol`) from `node_modules` to the `contracts` folder
-3. `npm run deployContracts` to deploy the registry, registrar, and resolver
+2. `npm run deployContracts` to deploy the registry, registrar, and resolver
 
 ### Under the hood
 The migration script `migrations\2_deploy_ens.js` does the following:

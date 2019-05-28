@@ -4,15 +4,6 @@
   "description": "Setup ENS (Registry, Registrar, Resolver) on a private network",
   "main": "index.js",
   "scripts": {
-    "copyEnsInterface": "cp ./node_modules/@ensdomains/ens/contracts/ENS.sol ./contracts/",
-    "copyEnsRegistry": "cp ./node_modules/@ensdomains/ens/contracts/ENSRegistry.sol ./contracts/",
-    "copyFifsRegistrar": "cp ./node_modules/@ensdomains/ens/contracts/FIFSRegistrar.sol ./contracts/",
-    "copyEnsContracts": "npm run copyEnsInterface && npm run copyEnsRegistry && npm run copyFifsRegistrar",
-    "copyResolver": "cp ./node_modules/@ensdomains/resolver/contracts/PublicResolver.sol ./contracts/",
-    "copyResolverBase": "cp ./node_modules/@ensdomains/resolver/contracts/ResolverBase.sol ./contracts/",
-    "copyResolverProfiles": "cp -a ./node_modules/@ensdomains/resolver/contracts/profiles ./contracts",
-    "copyResolverContracts": "npm run copyResolver && npm run copyResolverBase && npm run copyResolverProfiles",
-    "copyContracts": "npm run copyResolverContracts && npm run copyEnsContracts",
     "deployContracts": "./node_modules/.bin/truffle migrate --reset",
     "test": "./node_modules/.bin/truffle test"
   },

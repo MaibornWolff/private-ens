@@ -1,7 +1,7 @@
 module.exports = async function registerLabelAndStoreAddressAndAbi(
   ENSArtifacts, ContractArtifact, web3, label
-) 
-{
+) {
+
   const ENSArtifact = ENSArtifacts.registry;
   const RegistrarArtifact = ENSArtifacts.registrar;
   const ResolverArtifact = ENSArtifacts.resolver;
