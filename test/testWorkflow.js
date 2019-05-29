@@ -37,17 +37,17 @@ contract('Workflow', function (accounts) {
   });
 
   describe('Initial Setup', function() {
-    it('Step 1. Register a subdomain with the registrar', async function () {
+    it('registers a subdomain with the registrar (step 1)', async function () {
       await registrarInstance.register(subdomainLabel, bob, {from: bob});
       assert.equal(await registryInstance.owner(subdomainNamehash), bob);
     });
 
-    it('Step 2. Set the resolver for that domain in the registry', async function () {
+    it('sets the resolver for that domain in the registry (step 2)', async function () {
       await registryInstance.setResolver(subdomainNamehash, resolverInstance.address, {from: bob});
       assert.equal(resolverInstance.address, await registryInstance.resolver(subdomainNamehash));
     });
 
-    it('Step 3. Set the address and abi for that domain in the resolver', async function () {
+    it('sets the address and abi for that domain in the resolver (step 3)', async function () {
         await resolverInstance.setAddr(subdomainNamehash, coolContractAddress, {from: bob});
         assert.equal(await resolverInstance.addr(subdomainNamehash), coolContractAddress);
 
@@ -62,9 +62,8 @@ contract('Workflow', function (accounts) {
   })
 
   describe('Usage', function() {
-
     it('allows to lookup address and abi based on only the domain and registry address', async function () {
-        // These two pieces of information need to be known:
+        // In addition to the ABIs, only these two pieces of information need to be known:
         const domain = 'test.eth';
         const registryAddress = registryInstance.address
 

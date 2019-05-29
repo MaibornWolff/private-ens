@@ -1,7 +1,7 @@
 {
   "name": "private-ens",
   "version": "1.0.0",
-  "description": "Setup ENS (Registry, Registrar, Resolver) on a private network",
+  "description": "Easy setup of the Ethereum Name System (Registry, Registrar, Resolver) on a private network",
   "main": "index.js",
   "scripts": {
     "deployContracts": "./node_modules/.bin/truffle migrate --reset",
