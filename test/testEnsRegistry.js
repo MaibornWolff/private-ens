@@ -11,7 +11,7 @@ contract('ENSRegistry', function (accounts) {
   let registryInstance;
   const initialNode = '0x00';
 
-  const tld = 'eth';
+  const tld = 'example';
   const tldLabel = web3.utils.keccak256(tld);
   const tldNamehash = namehash.hash(tld);
 

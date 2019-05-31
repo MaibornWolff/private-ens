@@ -16,7 +16,7 @@ contract('Workflow', function (accounts) {
   let resolverInstance;
   const initialNode = '0x00';
 
-  const tld = 'eth';
+  const tld = 'example';
   const tldLabel = web3.utils.keccak256(tld);
   const tldNamehash = namehash.hash(tld);
 
@@ -64,7 +64,7 @@ contract('Workflow', function (accounts) {
   describe('Usage', function() {
     it('allows to lookup address and abi based on only the domain and registry address', async function () {
         // In addition to the ABIs, only these two pieces of information need to be known:
-        const domain = 'test.eth';
+        const domain = `${subdomain}.${tld}`;
         const registryAddress = registryInstance.address
 
         // The rest can be fetched:

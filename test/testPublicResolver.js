@@ -17,7 +17,7 @@ contract('PublicResolver', function (accounts) {
   let resolverInstance;
   const initialNode = '0x00';
 
-  const tld = 'eth';
+  const tld = 'example';
   const tldLabel = web3.utils.keccak256(tld);
   const tldNamehash = namehash.hash(tld);
 
@@ -111,7 +111,7 @@ contract('PublicResolver', function (accounts) {
           let result2 = await resolverInstance.ABI(subdomainNamehash, 0xFFFFFFFF);
           assert.deepEqual([result2[0].toNumber(), result2[1]], [0, null]);
       });
-      
+
       it('rejects invalid content types', async () => {
         await exceptions.catchRevert(resolverInstance.setABI(subdomainNamehash, 0x3, "0x12", {from: bob}));
       });

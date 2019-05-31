@@ -13,7 +13,7 @@ contract('FIFSRegistrar', function (accounts) {
   let registrarInstance;
   const initialNode = '0x00';
 
-  const tld = 'eth';
+  const tld = 'example';
   const tldLabel = web3.utils.keccak256(tld);
   const tldNamehash = namehash.hash(tld);
 
@@ -27,7 +27,7 @@ contract('FIFSRegistrar', function (accounts) {
       await registryInstance.setSubnodeOwner(initialNode, tldLabel, registrarInstance.address);
   });
 
-  it('should have set the registrar as the owner of the eth node', async function () {
+  it('should have set the registrar as the owner of the TLD node', async function () {
     assert.equal(await registryInstance.owner(tldNamehash), registrarInstance.address);
   });
 
