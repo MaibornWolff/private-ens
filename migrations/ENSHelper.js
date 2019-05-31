@@ -10,6 +10,7 @@ module.exports = async function registerLabelAndStoreAddressAndAbi(
 
   // We want to end up with the ownership of this domain
   const name = `${label}.${tld}`;
+  const labelhash = web3.sha3(label);
   const node = require('eth-ens-namehash').hash(name);
 
   // This is the contract that we want our domain to point to
@@ -24,11 +25,11 @@ module.exports = async function registerLabelAndStoreAddressAndAbi(
   const resolver = await ResolverArtifact.at(ResolverArtifact.networks[netId].address);
 
   // Register mycontract.<tld>
-  await registrar.register(web3.sha3(label), owner, {from: owner});
+  await registrar.register(labelhash, owner, {from: owner});
   if ((await registry.owner(node)).toLowerCase() !== owner) {
     throw `Failed to register '${name}'`;
   } else {
-    console.log(`Successfully registered '${name}' (node '${node}')`);
+    console.log(`Successfully registered '${name}' (label ${labelhash}, node '${node}')`);
   }
 
   // Set the resolver
