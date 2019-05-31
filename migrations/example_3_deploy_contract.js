@@ -8,15 +8,16 @@ const ENSArtifacts = {
   resolver: artifacts.require('PublicResolver.sol')
 }
 
-const Test = artifacts.require("Test.sol");
+const MyContract = artifacts.require("MyContract.sol");
 
-const name = "test";
+const name = "mycontract";
+const tld = "example";
 const registerLabelAndStoreAddressAndAbi = require("./ENSHelper");
 
 module.exports = function(deployer, network) {
 
-  deployer.deploy(Test)
+  deployer.deploy(MyContract)
   .then(async function() {
-    await registerLabelAndStoreAddressAndAbi(ENSArtifacts, Test, web3, name);
+    await registerLabelAndStoreAddressAndAbi(ENSArtifacts, MyContract, web3, name, tld);
   })
 };

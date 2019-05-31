@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 
 // Generic contract that is used to demonstrate domain registration during migration
-contract Test {
+contract MyContract {
     uint256 private storedValue = 0;
 
     function getValue() public view returns (uint256) {
