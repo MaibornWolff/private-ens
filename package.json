@@ -4,8 +4,8 @@
   "description": "Easy setup of the Ethereum Name System (Registry, Registrar, Resolver) on a private network",
   "main": "index.js",
   "scripts": {
-    "deployContracts": "./node_modules/.bin/truffle migrate --reset",
-    "test": "./node_modules/.bin/truffle test"
+    "deployContracts": "npx truffle migrate --reset",
+    "test": "npx truffle test"
   },
   "repository": {
     "type": "git",

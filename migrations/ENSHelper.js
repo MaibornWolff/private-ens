@@ -10,7 +10,7 @@ module.exports = async function registerLabelAndStoreAddressAndAbi(
 
   // We want to end up with the ownership of this domain
   const name = `${label}.${tld}`;
-  const labelhash = web3.sha3(label);
+  const labelhash = web3.utils.sha3(label);
   const node = require('eth-ens-namehash').hash(name);
 
   // This is the contract that we want our domain to point to

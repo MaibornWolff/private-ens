@@ -10,7 +10,7 @@ module.exports = function(deployer, network) {
   let tld = 'example';
   let ensInstance, registrarInstance;
   const tldNode = namehash.hash(tld);
-  const tldLabelhash = web3.sha3(tld);
+  const tldLabelhash = web3.utils.sha3(tld);
 
   // Step 1: deploy the registry
   deployer.deploy(ENS)
